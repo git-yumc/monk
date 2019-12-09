@@ -1,0 +1,113 @@
+<script>
+    $(function () {
+        //初始化表格 并查询所有
+        $("#bannerList").jqGrid({
+            caption: "文章",
+            styleUI: "Bootstrap",
+            autowidth: true,
+            height:340,
+            url: "../article/select",
+            datatype: "json",
+            colNames: ["id", "标题","封面", "作者", "内容", "创建时间","所属上师","操作"],
+            colModel: [
+                {name: "id",align:"center"},
+                {name: "title", align:"center"},
+                {
+                    name: "img",
+                    formatter: function (value, options, row) {
+                        let l=`<img src="../statics/img/user/`+row.img+`" height="100px" >`;
+                        return l;
+                    }
+                },
+                {name: "author", align:"center"},
+                {name: "content", align:"center"},
+                {name: "createDate", align:"center"},
+                {name: "guru.name", editable: true,align:"center"},
+                {name:"option",formatter:function (cellvalue, options, row) {
+                        sessionStorage.setItem('row', row);
+                        let result = '';
+                        result += "<button type='button'  onclick=\"showModel()\" class='btn btn-primary'>查看详情</button>";
+                        return result;
+                    }}
+            ],
+            pager: "#pager",
+            viewrecords: true,
+            rowNum: 2,
+            mtype : "post",
+            multiselect:true,
+            rowList: [2, 5, 10],
+            editurl: "../article/edit",
+        }).navGrid(
+            '#pager',//参数1: 分页工具栏id
+            {edit : false, add : false, del : true,
+                deltext:"删除"}  //参数2:开启工具栏编辑按钮
+        );
+    });
+    // 打开模态框
+    function addArticle() {
+        // 清除表单内数据
+        $("#kindfrm")[0].reset();
+        // kindeditor 提供的数据回显方法  通过"" 将内容设置为空串
+        KindEditor.html("#editor_id", "");
+        // 未提供查询上师信息 发送ajax请求查询
+        $("#modal_foot").html("<button type=\"button\" class=\"btn btn-danger\" data-dismiss=\"modal\">关闭</button>"+
+            "<button type=\"button\" class=\"btn btn-primary\" onclick=\"insertArticle()\">添加</button>")
+        $("#kind").modal("show");
+    }
+
+    // 编辑文章
+    function showModel() {
+        // 返回指定行的数据，返回数据类型为name:value，name为colModel中的名称，value为所在行的列的值，如果根据rowid找不到则返回空。在编辑模式下不能用此方法来获取数据，它得到的并不是编辑后的值
+        var data = sessionStorage.getItem('row');
+        $("#title").val(data.title);
+        //$("#status").val(data.status);
+        $("#id").val(data.id);
+        // KindEditor 中的赋值方法 参数1: kindeditor文本框 的id
+        KindEditor.html("#editor_id",data.content);
+        $("#modal_foot").html("<button type=\"button\" class=\"btn btn-danger\" data-dismiss=\"modal\">关闭</button>"+
+            "<button type=\"button\" class=\"btn btn-primary\" onclick=\"updateArticle()\">修改</button>")
+        $("#kind").modal("show");
+    }
+
+    // 添加文章
+    function insertArticle() {
+        $.ajaxFileUpload({
+            url:"${pageContext.request.contextPath}/article/insertArticle",
+            datatype:"json",
+            type:"post",
+            fileElementId:"inputfile",
+            // ajaxFileUpload 不支持序列化数据上传id=111&&title="XXX"
+            //                只支持 Json格式上传数据
+            // 解决方案 : 1.更改 ajaxFileUpload 源码 2. 手动封装Json格式
+            data:{id:$("#formid").val(),title:$("#name").val(),guru_id:$("#guruList").val(),content:$("#editor_id").val()},
+            success:function (data) {
+
+            }
+        })
+    }
+    function updateArticle() {
+        $.ajaxFileUpload({
+            url:"${pageContext.request.contextPath}/article/insertArticle",
+            datatype:"json",
+            type:"post",
+            fileElementId:"inputfile",
+            // ajaxFileUpload 不支持序列化数据上传id=111&&title="XXX"
+            //                只支持 Json格式上传数据
+            // 解决方案 : 1.更改 ajaxFileUpload 源码 2. 手动封装Json格式
+            data:{id:$("#formid").val(),title:$("#name").val(),guru_id:$("#guruList").val(),content:$("#editor_id").val()},
+            success:function (data) {
+
+            }
+        })
+    }
+</script>
+<div class="page-header">
+    <h3>文章管理</h3>
+    <ul class="nav nav-tabs">
+        <li class="active"><a>文章列表</a></li>
+        <li><a onclick="addArticle()">添加文章</a></li>
+    </ul>
+</div>
+
+<table id="bannerList"></table>
+<div id="pager"></div>

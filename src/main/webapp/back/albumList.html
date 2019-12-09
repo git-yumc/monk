@@ -1,0 +1,177 @@
+<script>
+    $(function () {
+        //初始化表格 并查询所有
+        $("#albumList").jqGrid({
+            caption: "专辑列表",
+            styleUI: "Bootstrap",
+            autowidth: true,
+            height:340,
+            subGrid : true,
+            url: "../album/select",
+            datatype: "json",
+            colNames: ["id", "标题", "图片", "作者", "播音","章节","简介","创建日期","评分"],
+            colModel: [
+                {name: "id",align:"center"},
+                {name: "title", editable: true,align:"center"},
+                {
+                    name: "img", editable: true, edittype:"file",editoptions:{enctype:"multipart/form-data"},
+                    formatter: function (value, options, row) {
+                        let l=`<img src="../statics/img/album/`+row.img+`" width="100%" >`;
+                        return l;
+                    }
+                },
+                {name: "author", editable: true,align:"center"},
+                {name: "announcer", editable: true,align:"center"},
+                {name: "count", editable: true,align:"center"},
+                {name: "introduction", editable: true,align:"center"},
+                {name: "createDate", editable: true,align:"center"},
+                {name: "score", editable: true,align:"center",width:"80%"}
+            ],
+            pager: "#pager",
+            viewrecords: true,
+            rowNum: 2,
+            mtype : "post",
+            multiselect:true,
+            rowList: [2, 5, 10],
+            editurl: "../album/edit",
+// 重写创建子表格方法
+            subGridRowExpanded : function(subgrid_id, row_id) {
+                addTable(subgrid_id,row_id);
+            },
+            // 删除表格方法
+            subGridRowColapsed : function(subgrid_id, row_id) {
+
+            }
+        }).navGrid(
+            '#pager',//参数1: 分页工具栏id
+            {edit : true, add : true, del : true,
+                edittext:"编辑",addtext:"添加",deltext:"删除"},   //参数2:开启工具栏编辑按钮
+            {
+                closeAfterEdit:true,reloadAfterSubmit: true,
+                afterSubmit:function (response,postData) {
+                    $.ajaxFileUpload({
+                        url:"../album/upload",
+                        datatype:"json",
+                        type:"post",
+                        data:{id:JSON.parse(response.responseText).id},
+                        // 指定的上传input框的id
+                        fileElementId:"img",
+                        success:function (data) {
+                            $("#albumList").trigger("reloadGrid");
+                        }
+                    });
+                    return postData;
+                }
+            },//编辑面板的配置
+            {closeAfterAdd: true, reloadAfterSubmit: true,
+                afterSubmit:function (response,postData) {
+                    $.ajaxFileUpload({
+                        url:"../album/upload",
+                        datatype:"json",
+                        type:"post",
+                        data:{id:JSON.parse(response.responseText).id},
+                        // 指定的上传input框的id
+                        fileElementId:"img",
+                        success:function (data) {
+                            // 输出上传成功
+                            // jqgrid重新载入
+                            $("#albumList").trigger("reloadGrid");
+                        }
+                    });
+                    return postData;
+                }
+            },//添加面板的配置
+            {},//删除的配置
+            {},//搜索的配置
+        );
+    });
+
+    function addTable(subgrid_id,row_id) {
+
+        // 声明子表格|工具栏id
+        var subgridTable = subgrid_id + "table";
+        var subgridPage = subgrid_id + "page";
+        // 根据下方空间id 创建表格及工具栏
+        $("#"+subgrid_id).html("<table id='"+subgridTable+"'></table><div style='height: 50px' id='"+subgridPage+"'></div>")
+        // 子表格JqGrid声明
+        $("#"+subgridTable).jqGrid({
+            url : "../chapter/select?albumId="+row_id,
+            datatype : "json",
+            colNames : [ 'id', '文件名',"大小","时长","文件" ],
+            colModel : [
+                {name: "id", editable: false,align:"center"},
+                {name: "cName", editable: true,align:"center"},
+                {name: "size", editable: false,align:"center"},
+                {name: "length", editable: false,align:"center"},
+                {name: "src", editable: true,edittype:"file",editoptions:{enctype:"multipart/form-data"},
+                    formatter: function (value, options, row) {
+                        let t=`<span  onclick="show('`+row.src+`')">播放 <span class="glyphicon glyphicon-play-circle"></span></span>`;
+                        return t;
+                    }
+                },
+            ],
+            rowNum : 20,
+            pager : "#"+subgridPage,
+            sortname : 'num',
+            sortorder : "asc",
+            height : '100%',
+            styleUI:"Bootstrap",
+            editurl: "../chapter/edit?albumId="+row_id,
+            autowidth:true
+        });
+        $("#" + subgridTable).jqGrid('navGrid',
+            "#" + subgridPage,
+            {edit : true, add : true, del : true,
+                edittext:"编辑",addtext:"添加",deltext:"删除"},   //参数2:开启工具栏编辑按钮
+            {
+                closeAfterEdit:true,reloadAfterSubmit: true,
+                afterSubmit:function (response,postData) {
+                    $.ajaxFileUpload({
+                        url:"../chapter/upload",
+                        datatype:"json",
+                        type:"post",
+                        data:{id:JSON.parse(response.responseText).id},
+                        // 指定的上传input框的id
+                        fileElementId:"src",
+                        success:function (data) {
+                            $("#" + subgridTable).trigger("reloadGrid");
+                        }
+                    });
+                    return postData;
+                }
+            },//编辑面板的配置
+            {closeAfterAdd: true, reloadAfterSubmit: true,
+                afterSubmit:function (response,postData) {
+                    $.ajaxFileUpload({
+                        url:"../chapter/upload",
+                        datatype:"json",
+                        type:"post",
+                        data:{id:JSON.parse(response.responseText).id},
+                        // 指定的上传input框的id
+                        fileElementId:"src",
+                        success:function (data) {
+                            // 输出上传成功
+                            // jqgrid重新载入
+                            $("#" + subgridTable).trigger("reloadGrid");
+                        }
+                    });
+                    return postData;
+                }
+            },//添加面板的配置
+            {},//删除的配置
+            {},//搜索的配置
+         );
+    }
+    function show(src){
+        document.getElementById('aaa').src="../statics/audio/"+src;
+        $('#mmm').modal('show');
+    }
+</script>
+<div class="page-header">
+    <h3>专辑管理</h3>
+</div>
+<table id="albumList"></table>
+<div id="pager"></div>
+<div class="modal fade" id="mmm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <audio src="" id="aaa" controls></audio>
+</div>

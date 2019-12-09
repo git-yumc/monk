@@ -1,0 +1,89 @@
+<script>
+    $(function () {
+        //初始化表格 并查询所有
+        $("#bannerList").jqGrid({
+            caption: "轮播图列表",
+            styleUI: "Bootstrap",
+            autowidth: true,
+            height:340,
+            url: "../banner/select",
+            datatype: "json",
+            colNames: ["id", "名称", "图片", "图片说明", "图片链接","展示状态"],
+            colModel: [
+                {name: "id",align:"center"},
+                {name: "bName", editable: true,align:"center"},
+                {
+                    name: "src", editable: true, edittype:"file",editoptions:{enctype:"multipart/form-data"},
+                    formatter: function (value, options, row) {
+                        let l=`<img src="../statics/img/banner/`+row.src+`" width="100%" >`;
+                        return l;
+                    },width:"120%"
+                },
+                {name: "introduction", editable: true,align:"center"},
+                {name: "href", editable: true,align:"center"},
+                {name: "status", editable: true,align:"center",width:"80%",formatter:function (data) {
+                        if (data=="1"){
+                            return "展示";
+                        }else return "冻结";
+                    },editable:true,edittype:"select",editoptions:{value:"1:展示;0:冻结"}
+                }
+            ],
+            pager: "#pager",
+            viewrecords: true,
+            rowNum: 2,
+            mtype : "post",
+            multiselect:true,
+            rowList: [2, 5, 10],
+            editurl: "../banner/edit",
+
+        }).navGrid(
+            '#pager',//参数1: 分页工具栏id
+            {edit : true, add : true, del : true,
+                edittext:"编辑",addtext:"添加",deltext:"删除"},   //参数2:开启工具栏编辑按钮
+            {
+                closeAfterEdit:true,reloadAfterSubmit: true,
+                afterSubmit:function (response,postData) {
+                    $.ajaxFileUpload({
+                        url:"../banner/upload",
+                        datatype:"json",
+                        type:"post",
+                        data:{id:JSON.parse(response.responseText).id},
+                        // 指定的上传input框的id
+                        fileElementId:"src",
+                        success:function (data) {
+                            $("#bannerList").trigger("reloadGrid");
+                        }
+                    });
+                    return postData;
+                }
+            },//编辑面板的配置
+            {closeAfterAdd: true, reloadAfterSubmit: true,
+                afterSubmit:function (response,postData) {
+                    $.ajaxFileUpload({
+                        url:"../banner/upload",
+                        datatype:"json",
+                        type:"post",
+                        data:{id:JSON.parse(response.responseText).id},
+                        // 指定的上传input框的id
+                        fileElementId:"src",
+                        success:function (data) {
+                            // 输出上传成功
+                            // jqgrid重新载入
+                            $("#bannerList").trigger("reloadGrid");
+                        }
+                    });
+                    return postData;
+                }
+            },//添加面板的配置
+            {},//删除的配置
+            {},//搜索的配置
+        );
+    });
+
+</script>
+<div class="page-header">
+    <h3>轮播图管理</h3>
+</div>
+
+<table id="bannerList"></table>
+<div id="pager"></div>

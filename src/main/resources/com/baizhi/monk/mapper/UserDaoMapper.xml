@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.baizhi.monk.dao.UserDao">
+    <select id="countNumber" resultType="java.lang.Integer">
+        select count(*) from user where #{day} &lt; create_date and sex=#{sex}
+    </select>
+    <select id="userAddress" resultType="com.baizhi.monk.entity.UserVO">
+        select address name,count(id) `value`
+        from user group by address
+    </select>
+</mapper>

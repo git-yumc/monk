@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>系统主页</title>
+    <!--引入bootstrap css-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!--引入jqgrid的bootstrap css-->
+    <link rel="stylesheet" href="../statics/jqgrid/css/ui.jqgrid-bootstrap.css">
+    <!--引入jquery核心js-->
+    <script src="../statics/js/jquery-3.4.1.min.js"></script>
+    <!--引入jqgrid核心js-->
+    <script src="../statics/jqgrid/js/jquery.jqGrid.min.js"></script>
+    <!--引入jqgrid国际化js-->
+    <script src="../statics/jqgrid/i18n/grid.locale-cn.js"></script>
+    <!--引入bootstrap组件js-->
+    <script src="../statics/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../statics/js/ajaxfileupload.js"></script>
+    <script src="../statics/js/echarts.min.js"></script>
+    <script src="../statics/js/china.js"></script>
+    <script src="../statics/kindeditor/kindeditor-all-min.js"></script>
+    <script src="../statics/kindeditor/lang/zh-CN.js"></script>
+    <script>
+        $(function () {
+            //切换样式
+            $(".list-group").on("click", ".list-group-item", function () {
+                //去掉所有
+                $(".list-group-item").removeClass().addClass("list-group-item");
+                //点击激活
+                $(this).addClass("active");
+            });
+            $.get(
+                "../admin/get",
+                null,
+                function (r) {
+                    if (r == '-1') {
+                        location.href = "login.html";
+                    } else {
+                        document.getElementById('adminName').innerText = r;
+                    }
+                }
+            );
+        });
+
+        function logout() {
+            $.get(
+                "../admin/logout",
+                null,
+                function (r) {
+                    location.href = "login.html";
+                }
+            );
+        }
+    </script>
+</head>
+<body>
+<!--导航条-->
+<nav class="navbar  nav-justified navbar-default">
+    <!--导航头-->
+    <div class="navbar-header">
+        <a class="navbar-brand" href="/monk/back/home.html">后台管理系统</a>
+    </div>
+
+    <!--导航内容信息-->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <div class="nav navbar-brand  navbar-right ">
+            <small>
+                欢迎: <span class="text-primary" id="adminName"></span>
+                &nbsp;&nbsp;
+            </small>
+            <small>
+                <a href="javascript:logout()">退出登录 <span class="glyphicon glyphicon-log-out"></span></a>
+            </small>
+        </div>
+    </div>
+</nav>
+<!--内容主体-->
+<div class="container-fluid">
+    <div class="row">
+        <!--左半部-->
+        <div class="col-sm-2">
+            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="headingOne">
+                        <h4 class="panel-title">
+                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne"
+                               aria-expanded="true" aria-controls="collapseOne">
+                                用户管理
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseOne" class="panel-collapse collapse " role="tabpanel"
+                         aria-labelledby="headingOne">
+                        <div class="panel-body">
+                            <div class="list-group">
+                                <a href="javascript:(function(){$('#content').load('userList.html');})()"
+                                   class="list-group-item ">
+                                    用户列表
+                                </a>
+                                <a href="javascript:(function(){$('#content').load('userStatistics.html');})()"
+                                   class="list-group-item ">
+                                    用户统计
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="headingTwo">
+                        <h4 class="panel-title">
+                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo"
+                               aria-expanded="false" aria-controls="collapseTwo">
+                                上师管理
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseTwo" class="panel-collapse collapse " role="tabpanel"
+                         aria-labelledby="headingTwo">
+                        <div class="panel-body">
+                            <div class="list-group">
+                                <a href="javascript:(function(){$('#content').load('guruList.html');})()"
+                                   class="list-group-item">
+                                    上师列表
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="headingFive">
+                        <h4 class="panel-title">
+                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
+                               href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                专辑管理
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseFive" class="panel-collapse collapse" role="tabpanel"
+                         aria-labelledby="headingFive">
+                        <div class="panel-body">
+                            <div class="list-group">
+                                <a href="javascript:(function(){$('#content').load('albumList.html');})()"
+                                   class="list-group-item">
+                                    专辑列表
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="headingFour">
+                        <h4 class="panel-title">
+                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion"
+                               href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                文章管理
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseFour" class="panel-collapse collapse" role="tabpanel"
+                         aria-labelledby="headingFour">
+                        <div class="panel-body">
+                            <div class="list-group">
+                                <a href="javascript:(function(){$('#content').load('articleList.html');})()"
+                                   class="list-group-item">
+                                    文章列表
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="headingSix">
+                        <h4 class="panel-title">
+                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix"
+                               aria-expanded="false" aria-controls="collapseSix">
+                                轮播图管理
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="collapseSix" class="panel-collapse collapse " role="tabpanel"
+                         aria-labelledby="headingSix">
+                        <div class="panel-body">
+                            <div class="list-group">
+                                <a href="javascript:(function(){$('#content').load('bannerList.html');})()"
+                                   class="list-group-item">
+                                    轮播图列表
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--右半部-->
+        <div class="col-sm-10" id="content">
+            <div class="jumbotron">
+                <h2>欢迎来到后台管理系统</h2>
+                <p><br></p>
+                <p><a class="btn btn-primary btn-lg" href="#" role="button">Go</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="kind" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">文章信息</h4>
+            </div>
+            <div class="modal-body">
+                <form role="form" enctype="multipart/form-data" id="kindfrm">
+                    <input name="id" type="hidden" id="formid">
+                    <div class="form-group">
+                        <label for="name">标题</label>
+                        <input type="text" class="form-control" name="title" id="name" placeholder="请输入名称">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputfile">封面上传</label>
+                        <input type="file" name="articleImg" id="inputfile">
+                    </div>
+                    <div class="form-group">
+                        <label for="name">所属上师</label>
+                        <select class="form-control" id="guruList" name="guru_id" >
+
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editor_id">内容</label>
+                        <textarea id="editor_id" name="content" style="width:700px;height:300px;">
+&lt;strong&gt;HTML内容&lt;/strong&gt;
+</textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" id="modal_foot">
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+</body>
+</html>
